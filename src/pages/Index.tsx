@@ -123,6 +123,54 @@ const Index = () => {
     }
   ];
 
+  const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File | null}>({});
+
+  const homework = [
+    {
+      id: 1,
+      title: 'Написать программу на Python',
+      description: 'Создать калькулятор с 4 базовыми операциями',
+      class: '10А',
+      deadline: '15 декабря 2024',
+      status: 'active',
+      attachments: ['zadanie_calculator.pdf']
+    },
+    {
+      id: 2,
+      title: 'Алгоритм сортировки',
+      description: 'Реализовать быструю сортировку массива',
+      class: '10Б',
+      deadline: '18 декабря 2024',
+      status: 'active',
+      attachments: ['sorting_task.pdf']
+    },
+    {
+      id: 3,
+      title: 'SQL запросы',
+      description: 'Выполнить 10 запросов из методички',
+      class: '11Б',
+      deadline: '20 декабря 2024',
+      status: 'active',
+      attachments: ['sql_exercises.pdf', 'database_schema.png']
+    },
+    {
+      id: 4,
+      title: 'Проект: Класс Student',
+      description: 'Создать класс для работы со студентами',
+      class: '11А',
+      deadline: '12 декабря 2024',
+      status: 'overdue',
+      attachments: ['oop_requirements.pdf']
+    }
+  ];
+
+  const handleFileUpload = (homeworkId: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedFiles(prev => ({...prev, [homeworkId]: file}));
+    }
+  };
+
   const renderContent = () => {
     switch(activeSection) {
       case 'home':
@@ -411,6 +459,120 @@ const Index = () => {
           </div>
         );
 
+      case 'homework':
+        return (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="font-heading text-4xl font-bold">Домашние задания</h2>
+              <div className="flex gap-2">
+                <Badge variant="default" className="text-sm px-3 py-1">
+                  {homework.filter(h => h.status === 'active').length} активных
+                </Badge>
+                <Badge variant="destructive" className="text-sm px-3 py-1">
+                  {homework.filter(h => h.status === 'overdue').length} просрочено
+                </Badge>
+              </div>
+            </div>
+            <div className="grid gap-6">
+              {homework.map((hw) => (
+                <Card key={hw.id} className={`overflow-hidden ${
+                  hw.status === 'overdue' ? 'border-destructive/50' : ''
+                }`}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline">{hw.class}</Badge>
+                          {hw.status === 'overdue' && (
+                            <Badge variant="destructive" className="gap-1">
+                              <Icon name="AlertCircle" size={14} />
+                              Просрочено
+                            </Badge>
+                          )}
+                        </div>
+                        <CardTitle className="text-2xl">{hw.title}</CardTitle>
+                        <CardDescription className="text-base mt-2">
+                          {hw.description}
+                        </CardDescription>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Icon name="Calendar" size={16} />
+                          <span className="text-sm">Срок сдачи:</span>
+                        </div>
+                        <p className={`font-semibold mt-1 ${
+                          hw.status === 'overdue' ? 'text-destructive' : 'text-foreground'
+                        }`}>
+                          {hw.deadline}
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <Icon name="Paperclip" size={18} />
+                        Материалы к заданию:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {hw.attachments.map((file, idx) => (
+                          <Button key={idx} variant="outline" size="sm" className="gap-2">
+                            <Icon name="Download" size={16} />
+                            {file}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Icon name="Upload" size={18} />
+                        Сдать работу:
+                      </h4>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(hw.id, e)}
+                            accept=".py,.zip,.pdf,.doc,.docx"
+                          />
+                          <Button type="button" variant="secondary" className="gap-2">
+                            <Icon name="FileUp" size={18} />
+                            Выбрать файл
+                          </Button>
+                        </label>
+                        {uploadedFiles[hw.id] && (
+                          <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
+                            <Icon name="FileCheck" size={18} className="text-primary" />
+                            <span className="text-sm font-medium truncate max-w-[200px]">
+                              {uploadedFiles[hw.id]?.name}
+                            </span>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-6 w-6"
+                              onClick={() => setUploadedFiles(prev => ({...prev, [hw.id]: null}))}
+                            >
+                              <Icon name="X" size={14} />
+                            </Button>
+                          </div>
+                        )}
+                        <Button 
+                          disabled={!uploadedFiles[hw.id]}
+                          className="gap-2"
+                        >
+                          <Icon name="Send" size={18} />
+                          Отправить
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+
       case 'contacts':
         return (
           <div className="space-y-6 animate-fade-in">
@@ -533,6 +695,14 @@ const Index = () => {
               >
                 <Icon name="Calendar" size={18} />
                 Расписание
+              </Button>
+              <Button
+                variant={activeSection === 'homework' ? 'default' : 'ghost'}
+                onClick={() => setActiveSection('homework')}
+                className="gap-2"
+              >
+                <Icon name="ClipboardList" size={18} />
+                Домашние задания
               </Button>
               <Button
                 variant={activeSection === 'about' ? 'default' : 'ghost'}
