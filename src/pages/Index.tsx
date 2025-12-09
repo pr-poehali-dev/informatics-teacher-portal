@@ -82,6 +82,47 @@ const Index = () => {
     }
   ];
 
+  const schedule = [
+    {
+      day: 'Понедельник',
+      lessons: [
+        { time: '9:00 - 9:45', class: '10А', topic: 'Основы Python' },
+        { time: '10:00 - 10:45', class: '11Б', topic: 'Базы данных' },
+        { time: '15:00 - 16:30', type: 'consultation', topic: 'Консультация' }
+      ]
+    },
+    {
+      day: 'Вторник',
+      lessons: [
+        { time: '9:00 - 9:45', class: '10Б', topic: 'Алгоритмы' },
+        { time: '11:00 - 11:45', class: '11А', topic: 'ООП в Python' }
+      ]
+    },
+    {
+      day: 'Среда',
+      lessons: [
+        { time: '9:00 - 9:45', class: '10А', topic: 'Циклы и условия' },
+        { time: '10:00 - 10:45', class: '11Б', topic: 'SQL запросы' },
+        { time: '15:00 - 16:30', type: 'consultation', topic: 'Консультация' }
+      ]
+    },
+    {
+      day: 'Четверг',
+      lessons: [
+        { time: '9:00 - 9:45', class: '10Б', topic: 'Структуры данных' },
+        { time: '11:00 - 11:45', class: '11А', topic: 'Проектирование БД' }
+      ]
+    },
+    {
+      day: 'Пятница',
+      lessons: [
+        { time: '9:00 - 9:45', class: '10А', topic: 'Практика' },
+        { time: '10:00 - 10:45', class: '11Б', topic: 'Проектная работа' },
+        { time: '14:00 - 15:30', type: 'consultation', topic: 'Консультация' }
+      ]
+    }
+  ];
+
   const renderContent = () => {
     switch(activeSection) {
       case 'home':
@@ -313,6 +354,63 @@ const Index = () => {
           </div>
         );
 
+      case 'schedule':
+        return (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="font-heading text-4xl font-bold">Расписание занятий</h2>
+              <Badge variant="outline" className="text-base px-4 py-2">
+                <Icon name="Calendar" size={16} className="mr-2" />
+                Учебная неделя
+              </Badge>
+            </div>
+            <div className="grid gap-4">
+              {schedule.map((day, idx) => (
+                <Card key={idx} className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 pb-3">
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      <Icon name="CalendarDays" size={24} className="text-primary" />
+                      {day.day}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="divide-y">
+                      {day.lessons.map((lesson, lessonIdx) => (
+                        <div key={lessonIdx} className="p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-start justify-between gap-4 flex-wrap">
+                            <div className="flex items-start gap-3 flex-1 min-w-0">
+                              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                <Icon name={lesson.type === 'consultation' ? 'MessageSquare' : 'Clock'} size={20} className="text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-lg">{lesson.topic}</p>
+                                <div className="flex items-center gap-4 mt-1 text-muted-foreground flex-wrap">
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Clock" size={14} />
+                                    {lesson.time}
+                                  </span>
+                                  {lesson.class && (
+                                    <Badge variant="secondary">{lesson.class}</Badge>
+                                  )}
+                                  {lesson.type === 'consultation' && (
+                                    <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+                                      Консультация
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+
       case 'contacts':
         return (
           <div className="space-y-6 animate-fade-in">
@@ -427,6 +525,14 @@ const Index = () => {
               >
                 <Icon name="Lightbulb" size={18} />
                 Проекты
+              </Button>
+              <Button
+                variant={activeSection === 'schedule' ? 'default' : 'ghost'}
+                onClick={() => setActiveSection('schedule')}
+                className="gap-2"
+              >
+                <Icon name="Calendar" size={18} />
+                Расписание
               </Button>
               <Button
                 variant={activeSection === 'about' ? 'default' : 'ghost'}
